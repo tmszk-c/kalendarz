@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
-
+    //git test
     // Metoda statyczna do wyświetlania menu (poza main)
     public static void wyswietlMenu() {
         System.out.println("\n--- MENU GŁÓWNE KALENDARZA ---");
