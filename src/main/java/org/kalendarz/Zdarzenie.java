@@ -9,8 +9,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 public class Zdarzenie implements Comparable<Zdarzenie> {
 
     private String tytul;
-    private LocalDateTime data; // Nowszy standard daty w Java (zamiast Date)
-    private URL link; // URL wymusza poprawność formatu linku (http...)
+    private LocalDateTime data;
+    private URL link;
 
     // @JsonIgnore - KLUCZOWE DLA XML
     // Blokuje zapisywanie tej listy do pliku.
@@ -54,7 +54,7 @@ public class Zdarzenie implements Comparable<Zdarzenie> {
                 + listaOsob.size() + "]";
     }
 
-    // Implementacja Comparable (sortowanie domyślne - chronologiczne)
+    // Implementacja Comparable
     @Override
     public int compareTo(Zdarzenie inneZdarzenie) {
         return this.data.compareTo(inneZdarzenie.getData());

@@ -10,8 +10,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
-    //git test
-    // Metoda statyczna do wyświetlania menu (poza main)
+    // Metoda do wyświetlania manu
     public static void wyswietlMenu() {
         System.out.println("\n--- MENU GŁÓWNE KALENDARZA ---");
         // --- WYŚWIETLANIE I SORTOWANIE ---
@@ -34,20 +33,23 @@ public class Main {
 
     public static void main(String[] args) {
 
-        // Inicjalizacja narzędzi i list
+        // xml - do operacji na plikach, scanner - do czytania klawiatury.
         ObslugaXML xml = new ObslugaXML();
         Scanner scanner = new Scanner(System.in);
 
-        // Dane przechowywane w pamięci
+        // Listy to nasza "baza danych w RAM".
         ArrayList<Osoba> listaOsob = new ArrayList<>();
         ArrayList<Zdarzenie> listaZdarzen = new ArrayList<>();
 
-        // --- FAZA SETUP: Wczytywanie danych / Hard-coding ---
+        // Próbujemy wczytać dane z dysku na starcie.
         listaOsob = xml.wczytajOsoby("kontakty.xml");
         listaZdarzen = xml.wczytajZdarzenia("zdarzenia.xml");
 
+
+        // Jeśli plik nie istniał lub był pusty, lista będzie pusta.
+        // Wtedy wchodzimy w ten if i ładujemy "Dane Startowe" (Hard-coding),
         if (listaOsob.isEmpty()) {
-            System.out.println("Brak zapisanych danych XML. Inicjalizuję dane startowe.");
+            System.out.println("Brak zapisanych danych XML.");
 
             // 1. Wprowadzanie danych Osoba
             listaOsob.add(new Osoba("Anna Zielińska", "+48501101101", "anna.z@example.com"));
@@ -62,6 +64,8 @@ public class Main {
             listaOsob.add(new Osoba("Alicja Majewska", "+48690000000", "alicja.m@example.com"));
 
             // 2. Wprowadzanie Zdarzeń
+            // Blok try-catch jest wymagany, bo konstruktor URL może rzucić wyjątek MalformedURLException
+            // (np. gdybyśmy wpisali "httttpp://cośtam").
             try {
                 listaZdarzen.add(new Zdarzenie("Spotkanie Zarządu", LocalDateTime.of(2025, 11, 10, 10, 0), new URL("http://meetings.corp.com/zarzad")));
                 listaZdarzen.add(new Zdarzenie("Obiad z Inwestorem", LocalDateTime.of(2025, 11, 15, 13, 30), new URL("http://restauracja.com/rezerwacja")));
@@ -96,28 +100,36 @@ public class Main {
 
         while (true) {
             wyswietlMenu();
-
+            //Sprawdzamy, czy użytkownik wpisał liczbę (zabezpieczenie przed wpisaniem "abc").
             if (scanner.hasNextInt()) {
                 wybor = scanner.nextInt();
                 scanner.nextLine();
-
+                // Nowoczesny Switch (Java 14+) - strzałki -> są czytelniejsze niż dwukropki i break.
                 switch (wybor) {
                     case 1 -> {
+                        // sort(null) oznacza: użyj naturalnego porządku zdefiniowanego w klasie Osoba
+                        // (metoda compareTo interfejsu Comparable - pewnie po nazwisku).
                         listaOsob.sort(null);
                         System.out.println("\n--- KONTAKTY (WG NAZWISKA) ---");
+                        // Method reference: System.out::println to skrót od x -> System.out.println(x)
                         listaOsob.forEach(System.out::println);
                     }
                     case 2 -> {
+                        // sort(null) używa compareTo z klasy Zdarzenie
                         listaZdarzen.sort(null); // Sortowanie domyślne (Comparable - wg daty)
                         System.out.println("\n--- ZDARZENIA (WG DATY) ---");
                         listaZdarzen.forEach(System.out::println);
                     }
                     case 3 -> {
+                        // Tutaj podajemy WŁASNY komparator.
+                        // Nie używamy domyślnego sortowania po dacie, ale innej logiki (liczba uczestników).
                         listaZdarzen.sort(new SortowanieZdarzenieLiczbaOsob());
                         System.out.println("\n--- ZDARZENIA (WG POPULARNOŚCI) ---");
                         listaZdarzen.forEach(System.out::println);
                     }
                     case 4 -> {
+                        // Logika dodawania osoby z pętlami walidacyjnymi while(!poprawny...).
+                        // Użytkownik nie wyjdzie z pętli, dopóki nie poda poprawnego formatu (try-catch wyłapie błędy).
                         String email = "";
                         String telefon = "";
                         System.out.println("\n--- DODAJ NOWĄ OSOBĘ ---");
@@ -147,6 +159,7 @@ public class Main {
                         listaOsob.add(nowaOsoba);
 
                     }
+                    // Dodawanie zdarzenia. Trzeba parsować String na LocalDateTime.
                     case 5 ->  {
                         LocalDateTime dataCzas = null;
                         URL link = null;
@@ -156,6 +169,8 @@ public class Main {
                         boolean poprawnaData = false;
                         while (!poprawnaData) {
                             try {
+                                // Parsowanie daty: LocalDate.parse wymaga formatu RRRR-MM-DD (standard ISO).
+                                // Jeśli użytkownik wpisze "01.01.2025", poleci wyjątek DateTimeParseException.
                                 System.out.print("Wprowadź datę (format: RRRR-MM-DD): ");
                                 String dataStr = scanner.nextLine();
 
@@ -189,16 +204,19 @@ public class Main {
 
                     }
                     case 6 ->{
+                        // Ręczny zapis. Przekazujemy aktualny stan list do metody zapisz...
                         xml.zapiszOsoby(listaOsob, "kontakty.xml");
                         xml.zapiszZdarzenia(listaZdarzen, "zdarzenia.xml");
                         System.out.println("Zapis zakończony.");
                     }
                     case 7 -> {
+                        // Ręczny odczyt. Nadpisujemy zmienne listaOsob nowymi danymi z pliku.
                         listaOsob = xml.wczytajOsoby("kontakty.xml");
                         listaZdarzen = xml.wczytajZdarzenia("zdarzenia.xml");
                         System.out.println("Wczytano dane z plików XML.");
                     }
                     case 0 -> {
+                        // Autosave przy wyjściu
                         System.out.println("Zapisuję zmiany i kończę pracę.");
                         xml.zapiszOsoby(listaOsob, "kontakty.xml");
                         xml.zapiszZdarzenia(listaZdarzen, "zdarzenia.xml");
@@ -210,8 +228,9 @@ public class Main {
                     }
                 }
             } else {
+                // Jeśli użytkownik wpisał tekst zamiast liczby w menu:
                 System.out.println("Nieprawidłowe wejście. Wprowadź liczbę.");
-                scanner.nextLine(); // Czyszczenie bufora
+                scanner.nextLine(); // Czyścimy bufor skanera z błędnych danych, żeby nie było pętli nieskończonej.
             }
         }
     }

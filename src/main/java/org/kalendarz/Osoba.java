@@ -6,11 +6,14 @@ import org.apache.commons.validator.routines.EmailValidator;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
 
+// "implements Comparable<Osoba>" oznacza, że obiekty tej klasy "wiedzą",
+// jak się porównywać z innymi Osobami (potrzebne do sortowania).
 public class Osoba implements Comparable<Osoba> {
 
     private String nazwa;
     private String numer;
     private String email;
+    // Relacja: Jedna Osoba może mieć wiele Zdarzeń.
     private ArrayList<Zdarzenie> listaZadan;
 
     // Konstruktor bezparametrowy
@@ -21,13 +24,14 @@ public class Osoba implements Comparable<Osoba> {
 
     // Konstruktor z logiką walidacji
     public Osoba(String nazwa, String numer, String email) {
-        super();
         this.nazwa = nazwa;
 
         // Walidacja telefonu (biblioteka Google libphonenumber)
         // Sprawdza format międzynarodowy i zamienia na standard E164 (+48...)
         PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
         try {
+            // Próbujemy sparsować numer. "ZZ" to kod regionu (nieznany),
+            // biblioteka sama spróbuje zgadnąć po kierunkowym (+48).
             PhoneNumber numerTestowy = phoneUtil.parse(numer, "ZZ");
             if (phoneUtil.isValidNumber(numerTestowy)) {
                 this.numer = phoneUtil.format(numerTestowy, PhoneNumberUtil.PhoneNumberFormat.E164);
@@ -87,8 +91,8 @@ public class Osoba implements Comparable<Osoba> {
 
     @Override
     public String toString() {
-        return "Osoba [nazwa=" + getNazwa() + ", numer=" + getNumer() + ", email=" + getEmail() + ", liczbaZadan="
-                + listaZadan.size() + "]";
+        return "Osoba [nazwa = " + getNazwa() + ", numer = " + getNumer() + ", email=" + getEmail() + ", liczbaZadan="
+                + listaZadan.size() + " ]";
     }
 
     // Implementacja Comparable (sortowanie domyślne)
