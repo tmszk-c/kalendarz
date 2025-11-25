@@ -1,0 +1,86 @@
+<ArrayList>
+  <item>
+    <nazwa>Anna Zielińska</nazwa>
+    <numer>+48501101101</numer>
+    <email>anna.z@example.com</email>
+    <listaZadan>
+      <listaZadan>
+        <tytul>Spotkanie Zarządu</tytul>
+        <data>2025-11-10T10:00:00</data>
+        <link>http://meetings.corp.com/zarzad</link>
+      </listaZadan>
+    </listaZadan>
+  </item>
+  <item>
+    <nazwa>Marek Kowalski</nazwa>
+    <numer>+48602202202</numer>
+    <email>marek.k@example.com</email>
+    <listaZadan>
+      <listaZadan>
+        <tytul>Spotkanie Zarządu</tytul>
+        <data>2025-11-10T10:00:00</data>
+        <link>http://meetings.corp.com/zarzad</link>
+      </listaZadan>
+    </listaZadan>
+  </item>
+  <item>
+    <nazwa>Piotr Nowak</nazwa>
+    <numer>+48721303303</numer>
+    <email>piotr.n@example.com</email>
+    <listaZadan>
+      <listaZadan>
+        <tytul>Obiad z Inwestorem</tytul>
+        <data>2025-11-15T13:30:00</data>
+        <link>http://restauracja.com/rezerwacja</link>
+      </listaZadan>
+    </listaZadan>
+  </item>
+  <item>
+    <nazwa>Ewa Wójcik</nazwa>
+    <numer>+48785404404</numer>
+    <email>ewa.w@example.com</email>
+    <listaZadan>
+      <listaZadan>
+        <tytul>Obiad z Inwestorem</tytul>
+        <data>2025-11-15T13:30:00</data>
+        <link>http://restauracja.com/rezerwacja</link>
+      </listaZadan>
+    </listaZadan>
+  </item>
+  <item>
+    <nazwa>Krzysztof Jankowski</nazwa>
+    <numer>+48880505505</numer>
+    <email>krzysztof.j@example.com</email>
+    <listaZadan/>
+  </item>
+  <item>
+    <nazwa>Zofia Adamska</nazwa>
+    <numer>+48512606606</numer>
+    <email>zofia.a@example.com</email>
+    <listaZadan/>
+  </item>
+  <item>
+    <nazwa>Jan Bąk</nazwa>
+    <numer>+48660707707</numer>
+    <email>jan.b@example.com</email>
+    <listaZadan/>
+  </item>
+  <item>
+    <nazwa>Karolina Czarnecka</nazwa>
+    <numer>+48888808808</numer>
+    <email>karo.c@example.com</email>
+    <listaZadan/>
+  </item>
+  <item>
+    <nazwa>Tomasz Dąbrowski</nazwa>
+    <numer>+48505909909</numer>
+    <email>tomek.d@example.com</email>
+    <listaZadan/>
+  </item>
+  <item>
+    <nazwa>Alicja Majewska</nazwa>
+    <numer>+48690000000</numer>
+    <email>alicja.m@example.com</email>
+    <listaZadan/>
+  </item>
+</ArrayList>

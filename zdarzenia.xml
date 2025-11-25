@@ -1,0 +1,52 @@
+<ArrayList>
+  <item>
+    <tytul>Spotkanie Zarządu</tytul>
+    <data>2025-11-10T10:00:00</data>
+    <link>http://meetings.corp.com/zarzad</link>
+  </item>
+  <item>
+    <tytul>Obiad z Inwestorem</tytul>
+    <data>2025-11-15T13:30:00</data>
+    <link>http://restauracja.com/rezerwacja</link>
+  </item>
+  <item>
+    <tytul>Projekt Beta - Demo</tytul>
+    <data>2025-11-25T14:00:00</data>
+    <link>http://demo.projbeta.com/live</link>
+  </item>
+  <item>
+    <tytul>Szkolenie BHP i PPOŻ</tytul>
+    <data>2025-12-01T09:00:00</data>
+    <link>http://szkolenia.firma.com/bhp</link>
+  </item>
+  <item>
+    <tytul>Wigilia Firmowa</tytul>
+    <data>2025-12-20T18:00:00</data>
+    <link>http://wigilia.pl/info</link>
+  </item>
+  <item>
+    <tytul>Urodziny Szefa</tytul>
+    <data>2025-12-05T19:30:00</data>
+    <link>http://tort.com/lista</link>
+  </item>
+  <item>
+    <tytul>Kwartał Finansowy Q4</tytul>
+    <data>2025-12-30T08:00:00</data>
+    <link>http://finanse.pl/Q4</link>
+  </item>
+  <item>
+    <tytul>Wizyta Techników Serwisowych</tytul>
+    <data>2025-11-06T16:30:00</data>
+    <link>http://serwis.com/zgloszenie</link>
+  </item>
+  <item>
+    <tytul>Testowanie Nowej Apki</tytul>
+    <data>2025-11-28T11:00:00</data>
+    <link>http://testy.dev/platforma</link>
+  </item>
+  <item>
+    <tytul>Urlop Planowany</tytul>
+    <data>2026-01-01T12:00:00</data>
+    <link>http://urlopy.com/status</link>
+  </item>
+</ArrayList>
