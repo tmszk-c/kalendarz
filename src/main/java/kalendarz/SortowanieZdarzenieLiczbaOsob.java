@@ -1,5 +1,5 @@
 
-package org.kalendarz;
+package kalendarz;
 import java.util.Comparator;
 
 // Klasa zewnętrzna (Comparator) służąca do niestandardowego sortowania.

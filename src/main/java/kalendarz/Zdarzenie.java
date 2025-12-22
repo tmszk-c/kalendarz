@@ -1,13 +1,14 @@
-package org.kalendarz;
+package kalendarz;
 
 import java.net.URL;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class Zdarzenie implements Comparable<Zdarzenie> {
-
+    private int id;
     private String tytul;
     private LocalDateTime data; // Nowszy standard daty w Java (zamiast Date)
     private URL link; // URL wymusza poprawność formatu linku (http...)
@@ -48,11 +49,24 @@ public class Zdarzenie implements Comparable<Zdarzenie> {
         this.listaOsob.remove(osobaDoUsuniecia);
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     @Override
     public String toString() {
-        return "Zadanie [nazwa=" + getTytul() + ", data=" + getData() + ", link=" + getLink() + ", uczestnicy="
-                + listaOsob.size() + "]";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+        return "Zadanie [Nazwa: " + getTytul() +
+                ", Data: " + getData().format(formatter) +
+                ", Link: " + getLink() +
+                ", Uczestnicy: " + listaOsob.size() + "]";
     }
+
+
 
     // Implementacja Comparable (sortowanie domyślne - chronologiczne)
     @Override

@@ -1,4 +1,4 @@
-package org.kalendarz;
+package kalendarz;
 
 import java.util.ArrayList;
 
@@ -7,7 +7,7 @@ import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
 
 public class Osoba implements Comparable<Osoba> {
-
+    private int id;
     private String nazwa;
     private String numer;
     private String email;
@@ -85,9 +85,17 @@ public class Osoba implements Comparable<Osoba> {
         this.listaZadan.remove(zadanieDoUsuniecia);
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     @Override
     public String toString() {
-        return "Osoba [nazwa=" + getNazwa() + ", numer=" + getNumer() + ", email=" + getEmail() + ", liczbaZadan="
+        return "Osoba [Imię i nazwisko: " + getNazwa() + ", Numer tel: " + getNumer() + ", Email: " + getEmail() + ", Liczba zadań: "
                 + listaZadan.size() + "]";
     }
 
