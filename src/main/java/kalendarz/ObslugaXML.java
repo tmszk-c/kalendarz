@@ -1,4 +1,4 @@
-package org.kalendarz;
+package kalendarz;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.SerializationFeature;
