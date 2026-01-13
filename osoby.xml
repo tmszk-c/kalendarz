@@ -1,0 +1,16 @@
+<ArrayList>
+  <item>
+    <id>2</id>
+    <nazwa>tomek tomkowski</nazwa>
+    <numer>+48123123123</numer>
+    <email>tomek@email.com</email>
+    <listaZadan/>
+  </item>
+  <item>
+    <id>0</id>
+    <nazwa>sdf</nazwa>
+    <numer>+48123123123</numer>
+    <email>sdf@email.com</email>
+    <listaZadan/>
+  </item>
+</ArrayList>
