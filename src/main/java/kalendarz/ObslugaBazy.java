@@ -57,7 +57,7 @@ public class ObslugaBazy {
                     ps.setString(1, z.getTytul());
                     // Konwersja LocalDateTime -> Timestamp (format zrozumiały dla SQL Servera)
                     ps.setTimestamp(2, Timestamp.valueOf(z.getData()));
-                    ps.setString(3, z.getLink().toString());
+                    ps.setString(3, z.getLink() != null ? z.getLink().toString() : "");
                     ps.executeUpdate();
 
                     ResultSet rs = ps.getGeneratedKeys();
@@ -113,7 +113,14 @@ public class ObslugaBazy {
                     Timestamp ts = rsZdarzenia.getTimestamp("data");
                     LocalDateTime dataCzas = (ts != null) ? ts.toLocalDateTime() : LocalDateTime.now();
                     String linkStr = rsZdarzenia.getString("link");
-                    URL url = (linkStr != null) ? new URL(linkStr) : new URL("http://brak-linku.pl");
+                    URL url = null;
+                    if (linkStr != null && !linkStr.isBlank()) {  // <- sprawdzamy też pusty string
+                        try {
+                            url = new URL(linkStr);
+                        } catch (Exception e) {
+                            System.err.println("Niepoprawny link: " + linkStr + ", ustawiam null");
+                        }
+                    }
 
                     Zdarzenie z = new Zdarzenie(rsZdarzenia.getString("tytul"), dataCzas, url);
                     z.setId(rsZdarzenia.getInt("id"));
