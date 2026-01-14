@@ -1,6 +1,7 @@
 package kalendarz;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.net.URL;
@@ -30,10 +31,14 @@ public class MainWindow extends JFrame {
     private final ObslugaBazy obslugaBazy = new ObslugaBazy();
     private final ObslugaXML obslugaXML = new ObslugaXML();
 
+    // Ujednolicone nazwy plików z Main.java
+    private static final String FILE_OSOBY = "osoby.xml";
+    private static final String FILE_ZDARZENIA = "zdarzenia.xml";
+
     public MainWindow() {
-        setTitle("Kalendarz");
+        setTitle("Kalendarz Pro 2026");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(100, 100, 1100, 700);
+        setBounds(100, 100, 1150, 750); // Nieco większe okno dla lepszego układu
         getContentPane().setLayout(new BorderLayout());
 
         // ================== MENU GÓRNE ==================
@@ -57,11 +62,10 @@ public class MainWindow extends JFrame {
         menuObsluga.addSeparator();
         menuObsluga.add(miWyczysc);
 
+        // Akcje menu
         miWczytajBaze.addActionListener(e -> {
             if(obslugaBazy.wczytajDane(listaOsob, listaZdarzen)) {
-                odswiezTabele();
-                kalendarzWidget.setListaZdarzen(listaZdarzen);
-                ustawStatus("Pobrano dane z bazy.");
+                aktualizujPoWczytaniu("Pobrano dane z bazy.");
             } else {
                 ustawStatus("Błąd wczytywania danych z bazy.");
             }
@@ -73,16 +77,14 @@ public class MainWindow extends JFrame {
         });
 
         miWczytajXML.addActionListener(e -> {
-            listaOsob = obslugaXML.wczytajOsoby("osoby.xml");
-            listaZdarzen = obslugaXML.wczytajZdarzenia("zdarzenia.xml");
-            odswiezTabele();
-            kalendarzWidget.setListaZdarzen(listaZdarzen);
-            ustawStatus("Wczytano dane z XML.");
+            listaOsob = obslugaXML.wczytajOsoby(FILE_OSOBY);
+            listaZdarzen = obslugaXML.wczytajZdarzenia(FILE_ZDARZENIA);
+            aktualizujPoWczytaniu("Wczytano dane z XML.");
         });
 
         miZapiszXML.addActionListener(e -> {
-            obslugaXML.zapiszOsoby(listaOsob, "osoby.xml");
-            obslugaXML.zapiszZdarzenia(listaZdarzen, "zdarzenia.xml");
+            obslugaXML.zapiszOsoby(listaOsob, FILE_OSOBY);
+            obslugaXML.zapiszZdarzenia(listaZdarzen, FILE_ZDARZENIA);
             ustawStatus("Zapisano dane do XML.");
         });
 
@@ -98,18 +100,16 @@ public class MainWindow extends JFrame {
         JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
         getContentPane().add(tabbedPane, BorderLayout.CENTER);
 
-     // ---------- TAB OSOBY ----------
+        // ---------- TAB OSOBY ----------
         JPanel panelOsoby = new JPanel(new BorderLayout());
         modelOsoby = new DefaultTableModel(new Object[]{"ID", "Imię i Nazwisko", "Numer", "Email", "Liczba wydarzeń"}, 0);
         tableOsoby = new JTable(modelOsoby) {
             @Override
-            public boolean isCellEditable(int row, int column) {
-                return false; // zablokowanie edycji wszystkich komórek
-            }
+            public boolean isCellEditable(int row, int column) { return false; }
         };
         panelOsoby.add(new JScrollPane(tableOsoby), BorderLayout.CENTER);
 
-        JPanel panelOsobyPrzyciski = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel panelOsobyPrzyciski = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
         JButton btnDodajOsobe = new JButton("Dodaj");
         JButton btnEdytujOsobe = new JButton("Edytuj");
         JButton btnUsunOsobe = new JButton("Usuń");
@@ -125,13 +125,11 @@ public class MainWindow extends JFrame {
         modelZdarzenia = new DefaultTableModel(new Object[]{"ID", "Tytuł", "Data", "Link", "Liczba osób"}, 0);
         tableZdarzenia = new JTable(modelZdarzenia) {
             @Override
-            public boolean isCellEditable(int row, int column) {
-                return false; // zablokowanie edycji wszystkich komórek
-            }
+            public boolean isCellEditable(int row, int column) { return false; }
         };
         panelZdarzenia.add(new JScrollPane(tableZdarzenia), BorderLayout.CENTER);
 
-        JPanel panelZdarzeniaPrzyciski = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel panelZdarzeniaPrzyciski = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
         JButton btnDodajZdarzenie = new JButton("Dodaj");
         JButton btnEdytujZdarzenie = new JButton("Edytuj");
         JButton btnUsunZdarzenie = new JButton("Usuń");
@@ -146,7 +144,6 @@ public class MainWindow extends JFrame {
 
         tabbedPane.addTab("Zdarzenia", panelZdarzenia);
 
-
         // ---------- TAB KALENDARZ ----------
         JPanel panelKalendarz = new JPanel(new BorderLayout());
         kalendarzWidget = new JCalendarWidget(listaZdarzen, this::odswiezTabele);
@@ -155,10 +152,12 @@ public class MainWindow extends JFrame {
 
         // ================== STATUS BAR ==================
         statusBar = new JLabel("Gotowy");
-        statusBar.setBorder(BorderFactory.createEtchedBorder());
+        statusBar.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createEtchedBorder(),
+                new EmptyBorder(5, 10, 5, 10))); // Dodano marginesy, by uniknąć overlapu
         getContentPane().add(statusBar, BorderLayout.SOUTH);
 
-        // ================== AKCJE OSOBY ==================
+        // ================== AKCJE PRZYCISKÓW ==================
         btnDodajOsobe.addActionListener(e -> dodajLubEdytujOsobe(null));
         btnEdytujOsobe.addActionListener(e -> {
             int idx = tableOsoby.getSelectedRow();
@@ -174,10 +173,9 @@ public class MainWindow extends JFrame {
                 kalendarzWidget.setListaZdarzen(listaZdarzen);
                 zapiszAutomatycznie();
                 ustawStatus("Usunięto osobę: " + o.getNazwa());
-            } else ustawStatus("Wybierz osobę do usunięcia.");
+            }
         });
 
-        // ================== AKCJE ZDARZENIA ==================
         btnDodajZdarzenie.addActionListener(e -> dodajLubEdytujZdarzenie(null));
         btnEdytujZdarzenie.addActionListener(e -> {
             int idx = tableZdarzenia.getSelectedRow();
@@ -193,7 +191,7 @@ public class MainWindow extends JFrame {
                 kalendarzWidget.setListaZdarzen(listaZdarzen);
                 zapiszAutomatycznie();
                 ustawStatus("Usunięto zdarzenie: " + z.getTytul());
-            } else ustawStatus("Wybierz zdarzenie do usunięcia.");
+            }
         });
 
         btnPolacz.addActionListener(e -> {
@@ -203,21 +201,33 @@ public class MainWindow extends JFrame {
         });
 
         btnSortPopularnosc.addActionListener(e -> {
-            listaZdarzen.sort((a,b) -> b.getListaOsob().size() - a.getListaOsob().size());
+            listaZdarzen.sort(new SortowanieZdarzenieLiczbaOsob().reversed());
             odswiezTabele();
-            ustawStatus("Zdarzenia posortowane wg popularności.");
+            ustawStatus("Zdarzenia posortowane wg popularności (malejąco).");
         });
 
-        // ================== PIERWSZE ODŚWIEŻENIE I WCZYTANIE DANYCH Z BAZY ==================
+        // ================== LOGIKA STARTOWA (FALLBACK) ==================
         if(obslugaBazy.wczytajDane(listaOsob, listaZdarzen)) {
-            // Ustawienie ID następnych elementów
-            nextOsobaId = listaOsob.stream().mapToInt(Osoba::getId).max().orElse(0) + 1;
-            nextZdarzenieId = listaZdarzen.stream().mapToInt(Zdarzenie::getId).max().orElse(0) + 1;
-            odswiezTabele();
-            kalendarzWidget.setListaZdarzen(listaZdarzen);
-            ustawStatus("Dane z bazy załadowane przy starcie.");
+            aktualizujPoWczytaniu("Dane z bazy załadowane przy starcie.");
+        } else {
+            // Logika Fallback z Main.java
+            System.out.println("[INFO] Baza niedostępna, próbuję wczytać XML...");
+            listaOsob = obslugaXML.wczytajOsoby(FILE_OSOBY);
+            listaZdarzen = obslugaXML.wczytajZdarzenia(FILE_ZDARZENIA);
+            if (!listaOsob.isEmpty() || !listaZdarzen.isEmpty()) {
+                aktualizujPoWczytaniu("Baza offline - wczytano dane z plików XML.");
+            } else {
+                ustawStatus("Nie znaleziono danych w bazie ani w plikach XML.");
+            }
         }
+    }
 
+    private void aktualizujPoWczytaniu(String msg) {
+        nextOsobaId = listaOsob.stream().mapToInt(Osoba::getId).max().orElse(0) + 1;
+        nextZdarzenieId = listaZdarzen.stream().mapToInt(Zdarzenie::getId).max().orElse(0) + 1;
+        odswiezTabele();
+        kalendarzWidget.setListaZdarzen(listaZdarzen);
+        ustawStatus(msg);
     }
 
     private void ustawStatus(String msg) {
@@ -225,6 +235,10 @@ public class MainWindow extends JFrame {
     }
 
     public void odswiezTabele() {
+        // Dodano automatyczne sortowanie przed odświeżeniem (zgodnie z Main.java)
+        listaOsob.sort(null);
+        listaZdarzen.sort(null);
+
         modelOsoby.setRowCount(0);
         for (Osoba o : listaOsob) {
             modelOsoby.addRow(new Object[]{o.getId(), o.getNazwa(), o.getNumer(), o.getEmail(), o.getListaZadan().size()});
@@ -258,17 +272,15 @@ public class MainWindow extends JFrame {
                     Osoba nowa = new Osoba(txtNazwa.getText(), txtNumer.getText(), txtEmail.getText());
                     nowa.setId(nextOsobaId++);
                     listaOsob.add(nowa);
-                    ustawStatus("Dodano osobę: " + nowa.getNazwa());
                 } else {
                     o.setNazwa(txtNazwa.getText());
                     o.setNumer(txtNumer.getText());
                     o.setEmail(txtEmail.getText());
-                    ustawStatus("Zaktualizowano osobę: " + o.getNazwa());
                 }
                 odswiezTabele();
                 zapiszAutomatycznie();
             } catch (Exception e) {
-                ustawStatus("Błąd: " + e.getMessage());
+                JOptionPane.showMessageDialog(this, "Błąd walidacji: " + e.getMessage(), "Błąd", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
@@ -296,18 +308,16 @@ public class MainWindow extends JFrame {
                     Zdarzenie nowe = new Zdarzenie(txtTytul.getText(), dt, url);
                     nowe.setId(nextZdarzenieId++);
                     listaZdarzen.add(nowe);
-                    ustawStatus("Dodano zdarzenie: " + nowe.getTytul());
                 } else {
                     z.setTytul(txtTytul.getText());
                     z.setData(dt);
                     z.setLink(url);
-                    ustawStatus("Zaktualizowano zdarzenie: " + z.getTytul());
                 }
                 odswiezTabele();
                 kalendarzWidget.setListaZdarzen(listaZdarzen);
                 zapiszAutomatycznie();
             } catch (Exception e) {
-                ustawStatus("Błąd: " + e.getMessage());
+                JOptionPane.showMessageDialog(this, "Błąd: " + e.getMessage(), "Błąd", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
@@ -318,35 +328,26 @@ public class MainWindow extends JFrame {
             return;
         }
 
-        String[] osobyStr = listaOsob.stream().map(Osoba::getNazwa).toArray(String[]::new);
-        String wybranaOsoba = (String) JOptionPane.showInputDialog(this, "Wybierz osobę:", "Połącz z wydarzeniem", JOptionPane.QUESTION_MESSAGE, null, osobyStr, osobyStr[0]);
-        if (wybranaOsoba == null) return;
-        Osoba o = listaOsob.stream().filter(x -> x.getNazwa().equals(wybranaOsoba)).findFirst().get();
+        Osoba o = (Osoba) JOptionPane.showInputDialog(this, "Wybierz osobę:", "Połącz", JOptionPane.QUESTION_MESSAGE, null, listaOsob.toArray(), null);
+        if (o == null) return;
 
-        String[] zdarzeniaStr = listaZdarzen.stream().map(Zdarzenie::getTytul).toArray(String[]::new);
-        String wybraneZdarzenie = (String) JOptionPane.showInputDialog(this, "Wybierz zdarzenie:", "Połącz z osobą", JOptionPane.QUESTION_MESSAGE, null, zdarzeniaStr, zdarzeniaStr[0]);
-        if (wybraneZdarzenie == null) return;
-        Zdarzenie z = listaZdarzen.stream().filter(x -> x.getTytul().equals(wybraneZdarzenie)).findFirst().get();
+        Zdarzenie z = (Zdarzenie) JOptionPane.showInputDialog(this, "Wybierz zdarzenie:", "Połącz", JOptionPane.QUESTION_MESSAGE, null, listaZdarzen.toArray(), null);
+        if (z == null) return;
 
-        o.dodajZadanie(z);
-        z.dodajOsobe(o);
-        odswiezTabele();
-        kalendarzWidget.setListaZdarzen(listaZdarzen);
-        ustawStatus("Połączono " + o.getNazwa() + " z " + z.getTytul());
-        zapiszAutomatycznie();
+        if (!o.getListaZadan().contains(z)) {
+            o.dodajZadanie(z);
+            z.dodajOsobe(o);
+            ustawStatus("Połączono: " + o.getNazwa() + " z " + z.getTytul());
+        }
     }
 
-    // ================== AUTOMATYCZNY ZAPIS ==================
     private void zapiszAutomatycznie() {
         obslugaBazy.zapiszDane(listaOsob, listaZdarzen);
-        obslugaXML.zapiszOsoby(listaOsob, "osoby.xml");
-        obslugaXML.zapiszZdarzenia(listaZdarzen, "zdarzenia.xml");
+        obslugaXML.zapiszOsoby(listaOsob, FILE_OSOBY);
+        obslugaXML.zapiszZdarzenia(listaZdarzen, FILE_ZDARZENIA);
     }
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new MainWindow().setVisible(true));
     }
 }
-
-
-
