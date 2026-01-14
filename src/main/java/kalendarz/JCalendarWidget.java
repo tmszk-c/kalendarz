@@ -1,8 +1,8 @@
 package kalendarz;
 
 import com.toedter.calendar.*;
-
 import javax.swing.*;
+import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.*;
 import java.net.URL;
@@ -23,6 +23,7 @@ public class JCalendarWidget extends JPanel {
         this.callback = callback;
 
         setLayout(new BorderLayout());
+        setBorder(new LineBorder(Color.LIGHT_GRAY, 1));
 
         calendar = new JCalendar();
         calendar.setLocale(new Locale("pl", "PL"));
@@ -32,16 +33,16 @@ public class JCalendarWidget extends JPanel {
 
         poprawNazwyMiesiecy();
 
+        // Nasłuchiwanie zmian daty, aby odświeżyć kropki/etykiety wydarzeń
         calendar.getMonthChooser().addPropertyChangeListener("month", e -> odswiez());
         calendar.getYearChooser().addPropertyChangeListener("year", e -> odswiez());
 
         initDayButtons();
 
-        // WAŻNE: odśwież od razu, żeby w pierwszym widoku były pokazane wydarzenia
+        // Pierwsze odświeżenie po załadowaniu GUI
         SwingUtilities.invokeLater(this::odswiez);
     }
 
-    // --- Poprawione nazwy miesięcy ---
     private void poprawNazwyMiesiecy() {
         String[] months = {
                 "styczeń", "luty", "marzec", "kwiecień",
@@ -54,12 +55,12 @@ public class JCalendarWidget extends JPanel {
         for (String m : months) box.addItem(m);
     }
 
-    // --- Inicjalizacja kafelków dni ---
     private void initDayButtons() {
         JDayChooser chooser = calendar.getDayChooser();
         for (Component c : chooser.getDayPanel().getComponents()) {
             if (c instanceof JButton btn) {
-                btn.setLayout(null);
+                // ZMIANA: BorderLayout zamiast null layout zapobiega nakładaniu się tekstu
+                btn.setLayout(new BorderLayout()); 
                 btn.addActionListener(new DayListener());
                 btn.addMouseListener(new HoverEffect(btn));
             }
@@ -71,7 +72,6 @@ public class JCalendarWidget extends JPanel {
         odswiez();
     }
 
-    // --- Odświeżanie kafelków z wydarzeniami i labelami ---
     public void odswiez() {
         if (isRefreshing) return;
         isRefreshing = true;
@@ -84,11 +84,14 @@ public class JCalendarWidget extends JPanel {
             if (!(c instanceof JButton btn)) continue;
 
             btn.removeAll();
-            btn.setOpaque(true);
-            btn.setContentAreaFilled(true);
             btn.setBackground(Color.WHITE);
+            btn.setVerticalAlignment(SwingConstants.TOP); // Numer dnia na górze
 
-            if (btn.getText().isEmpty()) continue;
+            if (btn.getText().isEmpty()) {
+                btn.revalidate();
+                btn.repaint();
+                continue;
+            }
 
             int day;
             try {
@@ -97,6 +100,7 @@ public class JCalendarWidget extends JPanel {
                 continue;
             }
 
+            // Filtrowanie wydarzeń dla konkretnego dnia
             long count = listaZdarzen.stream()
                     .filter(z -> z.getData() != null &&
                             z.getData().getYear() == year &&
@@ -105,24 +109,27 @@ public class JCalendarWidget extends JPanel {
                     .count();
 
             if (count > 0) {
-                btn.setBackground(new Color(170, 210, 255)); // kolor dla dni z wydarzeniami
+                btn.setBackground(new Color(210, 230, 255)); // Jasnoniebieskie tło dla dni z planem
 
-                JLabel lblCount = new JLabel("Wydarzenia: " + count, SwingConstants.CENTER);
-                lblCount.setFont(new Font("Arial", Font.PLAIN, 9));
-                lblCount.setForeground(Color.BLACK);
-                lblCount.setBounds(0, btn.getHeight() - 18, btn.getWidth(), 14);
-                btn.add(lblCount);
+                // Tworzenie etykiety "licznika" na dole przycisku
+                JLabel lblCount = new JLabel(count + " wyd.", SwingConstants.CENTER);
+                lblCount.setFont(new Font("Arial", Font.BOLD, 10));
+                lblCount.setForeground(new Color(0, 102, 204));
+                lblCount.setOpaque(true);
+                lblCount.setBackground(new Color(255, 255, 255, 180)); // Półprzezroczyste tło
+                
+                // Dodanie do SOUTH, aby nie nachodziło na numer dnia w centrum/górze
+                btn.add(lblCount, BorderLayout.SOUTH); 
             }
 
-            btn.setToolTipText(count > 0 ? "Wydarzenia: " + count : null);
+            btn.setToolTipText(count > 0 ? "Liczba wydarzeń: " + count : "Brak wydarzeń");
+            btn.revalidate();
+            btn.repaint();
         }
 
-        revalidate();
-        repaint();
         isRefreshing = false;
     }
 
-    // --- Hover na każdym kafelku ---
     private static class HoverEffect extends MouseAdapter {
         private final JButton btn;
         private Color original;
@@ -134,7 +141,7 @@ public class JCalendarWidget extends JPanel {
         @Override
         public void mouseEntered(MouseEvent e) {
             original = btn.getBackground();
-            btn.setBackground(original.brighter());
+            btn.setBackground(original.darker());
         }
 
         @Override
@@ -143,7 +150,6 @@ public class JCalendarWidget extends JPanel {
         }
     }
 
-    // --- Listener kliknięcia w dzień ---
     private class DayListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -162,11 +168,11 @@ public class JCalendarWidget extends JPanel {
                     events.add(z);
             }
 
-            String msg = events.isEmpty() ? "Brak wydarzeń" : "Wydarzenia tego dnia: " + events.size();
-            String[] options = {"Dodaj", "Edytuj", "Anuluj"};
+            String msg = events.isEmpty() ? "Brak wydarzeń tego dnia." : "Wybrano dzień: " + date.toLocalDate() + "\nLiczba wydarzeń: " + events.size();
+            Object[] options = {"Dodaj nowe", "Zarządzaj istniejącymi", "Zamknij"};
 
             int choice = JOptionPane.showOptionDialog(JCalendarWidget.this, msg,
-                    date.toLocalDate().toString(), JOptionPane.DEFAULT_OPTION,
+                    "Dzień: " + date.toLocalDate(), JOptionPane.DEFAULT_OPTION,
                     JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
 
             if (choice == 0) addEvent(date);
@@ -178,50 +184,52 @@ public class JCalendarWidget extends JPanel {
         JTextField title = new JTextField();
         JTextField link = new JTextField();
 
-        Object[] form = {"Tytuł:", title, "Link (opcjonalnie):", link};
-        if (JOptionPane.showConfirmDialog(this, form, "Nowe wydarzenie",
-                JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+        Object[] form = {
+            "Tytuł wydarzenia:", title,
+            "Link URL (opcjonalnie):", link
+        };
+
+        int result = JOptionPane.showConfirmDialog(this, form, "Dodaj nowe wydarzenie", JOptionPane.OK_CANCEL_OPTION);
+        
+        if (result == JOptionPane.OK_OPTION && !title.getText().trim().isEmpty()) {
             try {
                 URL u = link.getText().isEmpty() ? null : new URL(link.getText());
                 listaZdarzen.add(new Zdarzenie(title.getText(), date, u));
                 odswiez();
                 if (callback != null) callback.run();
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, ex.getMessage());
+                JOptionPane.showMessageDialog(this, "Błąd formatu: " + ex.getMessage());
             }
         }
     }
 
     private void editEvent(ArrayList<Zdarzenie> events) {
-        String[] names = events.stream().map(Zdarzenie::getTytul).toArray(String[]::new);
-        String selected = (String) JOptionPane.showInputDialog(this, "Wybierz wydarzenie:",
-                "Edytuj", JOptionPane.QUESTION_MESSAGE, null, names, names[0]);
+        Zdarzenie selected = (Zdarzenie) JOptionPane.showInputDialog(this, 
+                "Wybierz wydarzenie do edycji:", "Zarządzaj wydarzeniami",
+                JOptionPane.QUESTION_MESSAGE, null, events.toArray(), events.get(0));
 
         if (selected == null) return;
 
-        Zdarzenie z = events.stream().filter(ev -> ev.getTytul().equals(selected)).findFirst().get();
+        JTextField title = new JTextField(selected.getTytul());
+        JTextField dateField = new JTextField(selected.getData().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+        JTextField linkField = new JTextField(selected.getLink() == null ? "" : selected.getLink().toString());
 
-        JTextField title = new JTextField(z.getTytul());
-        JTextField date = new JTextField(z.getData().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
-        JTextField link = new JTextField(z.getLink() == null ? "" : z.getLink().toString());
+        Object[] form = {
+            "Tytuł:", title,
+            "Data i godzina:", dateField,
+            "Link:", linkField
+        };
 
-        Object[] form = {"Tytuł:", title, "Data (yyyy-MM-dd HH:mm):", date, "Link (opcjonalnie):", link};
-
-        if (JOptionPane.showConfirmDialog(this, form, "Edytuj wydarzenie",
-                JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+        if (JOptionPane.showConfirmDialog(this, form, "Edytuj", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
             try {
-                z.setTytul(title.getText());
-                z.setData(LocalDateTime.parse(date.getText(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
-                z.setLink(link.getText().isEmpty() ? null : new URL(link.getText()));
+                selected.setTytul(title.getText());
+                selected.setData(LocalDateTime.parse(dateField.getText(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+                selected.setLink(linkField.getText().isEmpty() ? null : new URL(linkField.getText()));
                 odswiez();
                 if (callback != null) callback.run();
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, ex.getMessage());
+                JOptionPane.showMessageDialog(this, "Błąd: " + ex.getMessage());
             }
         }
-    }
-
-    public JCalendar getCalendar() {
-        return calendar;
     }
 }
