@@ -2,10 +2,18 @@
 package kalendarz;
 import java.util.Comparator;
 
-// Klasa zewnętrzna (Comparator) służąca do niestandardowego sortowania.
-// Porównuje zdarzenia na podstawie tego, ile osób bierze w nich udział.
+/**
+ * Komparator służący do sortowania zdarzeń według ich popularności.
+ * Popularność jest definiowana jako liczba osób przypisanych do danego zdarzenia.
+ */
 public class SortowanieZdarzenieLiczbaOsob implements Comparator<Zdarzenie> {
 
+    /**
+     * Porównuje dwa zdarzenia na podstawie rozmiaru ich listy osób.
+     * @param z1 Pierwsze zdarzenie do porównania.
+     * @param z2 Drugie zdarzenie do porównania.
+     * @return Wartość ujemna, zero lub dodatnia, zależnie od wyniku porównania liczby uczestników.
+     */
     @Override
     public int compare(Zdarzenie z1, Zdarzenie z2) {
         // Pobieramy liczbę uczestników pierwszego zdarzenia

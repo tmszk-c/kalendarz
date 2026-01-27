@@ -7,12 +7,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Klasa zarządzająca trwałością danych w relacyjnej bazie danych SQL Server.
+ */
 public class ObslugaBazy {
 
     private static final String URL_DB = "jdbc:sqlserver://localhost:2222;databaseName=MojKalendarz;encrypt=true;trustServerCertificate=true;";
     private static final String USER = "sa";
     private static final String PASSWORD = "TwojeSilneHaslo123!";
 
+    /**
+     * Nawiązuje połączenie z bazą danych.
+     * @return Aktywne połączenie JDBC.
+     */
     public Connection polacz() {
         Connection conn = null;
         try {
@@ -23,7 +30,11 @@ public class ObslugaBazy {
         return conn;
     }
 
-    // 2. ZAPIS DANYCH (RAM -> BAZA)
+    /**
+     * Czyści tabele i zapisuje aktualny stan list osób i zdarzeń do bazy.
+     * @param osoby Lista osób.
+     * @param zdarzenia Lista zdarzeń.
+     */
     public void zapiszDane(ArrayList<Osoba> osoby, ArrayList<Zdarzenie> zdarzenia) {
         try (Connection conn = DriverManager.getConnection(URL_DB, USER, PASSWORD)) {
             conn.setAutoCommit(false);
@@ -85,8 +96,12 @@ public class ObslugaBazy {
         }
     }
 
-    // 3. ODCZYT DANYCH (BAZA -> RAM)
- // W ObslugaBazy.java zmieniamy sygnaturę metody:
+    /**
+     * Pobiera wszystkie dane z bazy i odbudowuje relacje między obiektami.
+     * @param listaOsob Docelowa lista na osoby.
+     * @param listaZdarzen Docelowa lista na zdarzenia.
+     * @return true, jeśli operacja się udała.
+     */
     public boolean wczytajDane(ArrayList<Osoba> listaOsob, ArrayList<Zdarzenie> listaZdarzen) {
         listaOsob.clear();
         listaZdarzen.clear();

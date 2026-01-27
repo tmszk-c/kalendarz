@@ -1,0 +1,30 @@
+<ArrayList>
+  <item>
+    <id>1032</id>
+    <nazwa>Bartek Czwartek</nazwa>
+    <numer>+48321321323</numer>
+    <email>bartek@email.pl</email>
+    <listaZadan>
+      <listaZadan>
+        <id>42</id>
+        <tytul>asdd</tytul>
+        <data>2026-01-09T12:00:00</data>
+        <link>https://www.asdd.pl</link>
+      </listaZadan>
+    </listaZadan>
+  </item>
+  <item>
+    <id>1031</id>
+    <nazwa>Ola Fasola</nazwa>
+    <numer>+48123123123</numer>
+    <email>ola@email.pl</email>
+    <listaZadan>
+      <listaZadan>
+        <id>41</id>
+        <tytul>asd</tytul>
+        <data>2026-01-08T12:00:00</data>
+        <link/>
+      </listaZadan>
+    </listaZadan>
+  </item>
+</ArrayList>

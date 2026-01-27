@@ -11,6 +11,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Locale;
 
+/**
+ * Niestandardowy komponent Swing wyświetlający kalendarz z zaznaczonymi wydarzeniami.
+ * Pozwala na interakcję z konkretnymi dniami w celu dodawania lub edycji zdarzeń.
+ */
 public class JCalendarWidget extends JPanel {
 
     private JCalendar calendar;
@@ -18,6 +22,11 @@ public class JCalendarWidget extends JPanel {
     private Runnable callback;
     private boolean isRefreshing = false;
 
+    /**
+     * Inicjalizuje widżet kalendarza.
+     * @param listaZdarzen Referencja do listy zdarzeń systemu.
+     * @param callback Funkcja zwrotna uruchamiana po zmianie danych (np. odświeżenie tabel).
+     */
     public JCalendarWidget(ArrayList<Zdarzenie> listaZdarzen, Runnable callback) {
         this.listaZdarzen = listaZdarzen;
         this.callback = callback;
@@ -67,12 +76,20 @@ public class JCalendarWidget extends JPanel {
         }
     }
 
+    /**
+     * Ustawia nową listę zdarzeń i odświeża widok.
+     * @param listaZdarzen Nowa lista obiektów Zdarzenie.
+     */
     public void setListaZdarzen(ArrayList<Zdarzenie> listaZdarzen) {
         this.listaZdarzen = listaZdarzen;
         odswiez();
     }
 
-    public void odswiez() {
+    /**
+     * Odświeża widok kalendarza, przeliczając liczbę wydarzeń dla każdego widocznego dnia
+     * i aktualizując etykiety na przyciskach dni.
+     */
+    public void odswiez(){
         if (isRefreshing) return;
         isRefreshing = true;
 
